@@ -1,0 +1,63 @@
+{
+  "name": "Pago Rural",
+  "short_name": "PagoRural",
+  "description": "Aplicación de pagos móviles para zonas rurales",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#8b5cf6",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "es",
+  "categories": ["finance", "productivity"],
+  "icons": [
+    {
+      "src": "pagorural.jpeg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "pagorural.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "pagorural.jpeg",
+      "sizes": "540x720",
+      "type": "image/jpeg",
+      "form_factor": "narrow"
+    }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "shortcuts": [
+    {
+      "name": "Pagar",
+      "short_name": "Pagar",
+      "description": "Realizar un pago rápido",
+      "url": "/pagar",
+      "icons": [
+        {
+          "src": "pagorural.jpeg",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Mi QR",
+      "short_name": "QR",
+      "description": "Ver mi código QR",
+      "url": "/mi-qr",
+      "icons": [
+        {
+          "src": "pagorural.jpeg",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}

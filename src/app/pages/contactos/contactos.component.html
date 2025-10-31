@@ -1,0 +1,266 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <div class="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-200">
+    <h1 class="text-xl font-semibold text-gray-900">Contactos</h1>
+    <div class="flex items-center space-x-2">
+      <button (click)="importarContactos()" [disabled]="!isConnected || isLoading"
+        class="p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50" title="Importar del historial">
+        <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z" />
+        </svg>
+      </button>
+      <button (click)="abrirModalAgregar()" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
+        <svg class="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Aviso de conexión -->
+  <div *ngIf="!isConnected" class="mx-6 mt-4 p-4 bg-orange-50 border border-orange-200 rounded-xl">
+    <div class="flex items-center space-x-3">
+      <svg class="w-6 h-6 text-orange-600" fill="currentColor" viewBox="0 0 24 24">
+        <path
+          d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
+      </svg>
+      <div class="flex-1">
+        <p class="font-medium text-orange-900">Conecta tu wallet</p>
+        <p class="text-sm text-orange-700">Conecta MetaMask para ver tus contactos</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Buscador -->
+  <div class="px-6 py-4 bg-white border-b border-gray-200">
+    <div class="relative">
+      <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="currentColor"
+        viewBox="0 0 24 24">
+        <path
+          d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z" />
+      </svg>
+      <input type="text" [(ngModel)]="busqueda" placeholder="Buscar por nombre o dirección..."
+        class="w-full pl-10 pr-4 py-3 bg-gray-100 rounded-full text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-white transition-colors">
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="px-6 py-4 bg-white">
+    <div class="flex space-x-2">
+      <button (click)="cambiarFiltro('todos')" class="px-6 py-2 rounded-full text-sm font-medium transition-colors"
+        [class.bg-purple-600]="filtroActivo === 'todos'" [class.text-white]="filtroActivo === 'todos'"
+        [class.bg-gray-200]="filtroActivo !== 'todos'" [class.text-gray-700]="filtroActivo !== 'todos'">
+        Todos ({{ contactos.length }})
+      </button>
+
+      <button (click)="cambiarFiltro('favoritos')" class="px-6 py-2 rounded-full text-sm font-medium transition-colors"
+        [class.bg-purple-600]="filtroActivo === 'favoritos'" [class.text-white]="filtroActivo === 'favoritos'"
+        [class.bg-gray-200]="filtroActivo !== 'favoritos'" [class.text-gray-700]="filtroActivo !== 'favoritos'">
+        Favoritos ({{ conteoFavoritos }})
+      </button>
+    </div>
+  </div>
+
+  <!-- Favoritos rápidos -->
+  <div *ngIf="filtroActivo === 'todos' && favoritos.length > 0" class="px-6 py-4 bg-white border-b border-gray-200">
+    <h3 class="text-sm font-medium text-gray-700 mb-3">Favoritos</h3>
+    <div class="flex space-x-4 overflow-x-auto pb-2">
+      <div *ngFor="let favorito of favoritos; trackBy: trackByAddress" (click)="enviarDinero(favorito)"
+        class="flex flex-col items-center cursor-pointer hover:opacity-75 transition-opacity flex-shrink-0">
+        <div class="relative">
+          <img [src]="favorito.avatar" alt="Avatar" class="w-16 h-16 rounded-full">
+          <div class="absolute -top-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
+            <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.46,13.97L5.82,21L12,17.27Z" />
+            </svg>
+          </div>
+        </div>
+        <p class="text-xs text-gray-600 mt-2 text-center max-w-[70px] truncate">{{ favorito.nombre }}</p>
+        <p class="text-xs text-gray-400 mt-0.5">{{ favorito.transaccionesRealizadas }} tx</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de contactos -->
+  <div class="bg-white">
+    <div *ngFor="let contacto of contactosFiltrados; let last = last; trackBy: trackByAddress" class="relative group">
+      <div class="flex items-center space-x-4 px-6 py-4 hover:bg-gray-50 transition-colors" [class.border-b]="!last"
+        [class.border-gray-200]="!last">
+
+        <div class="relative cursor-pointer" (click)="enviarDinero(contacto)">
+          <img [src]="contacto.avatar" alt="Avatar" class="w-12 h-12 rounded-full">
+          <div *ngIf="contacto.esFavorito"
+            class="absolute -top-1 -right-1 w-5 h-5 bg-yellow-400 rounded-full flex items-center justify-center">
+            <svg class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.46,13.97L5.82,21L12,17.27Z" />
+            </svg>
+          </div>
+        </div>
+
+        <div class="flex-1 min-w-0 cursor-pointer" (click)="enviarDinero(contacto)">
+          <div class="flex items-center space-x-2">
+            <p class="font-medium text-gray-900">{{ contacto.nombre }}</p>
+            <span *ngIf="contacto.transaccionesRealizadas >= 3"
+              class="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full">
+              {{ contacto.transaccionesRealizadas }}
+            </span>
+          </div>
+          <p class="text-xs text-gray-500 font-mono truncate">{{ contacto.address }}</p>
+          <div class="flex items-center space-x-3 mt-1">
+            <p *ngIf="contacto.ultimaTransaccion" class="text-xs text-gray-400">
+              Última transacción: {{ contacto.ultimaTransaccion | date:'dd/MM/yy' }}
+            </p>
+            <p *ngIf="!contacto.ultimaTransaccion" class="text-xs text-gray-400">
+              Sin transacciones
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <button (click)="toggleFavorito(contacto, $event)"
+            class="p-2 hover:bg-gray-200 rounded-full transition-colors"
+            [title]="contacto.esFavorito ? 'Quitar de favoritos' : 'Agregar a favoritos'">
+            <svg class="w-5 h-5" [class.text-yellow-500]="contacto.esFavorito"
+              [class.fill-current]="contacto.esFavorito" [class.text-gray-400]="!contacto.esFavorito" fill="none"
+              stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+            </svg>
+          </button>
+
+          <button (click)="enviarDinero(contacto)"
+            class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700 transition-colors">
+            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+            </svg>
+          </button>
+
+          <button (click)="abrirModalEditar(contacto, $event)"
+            class="p-2 hover:bg-gray-100 rounded-full transition-colors opacity-0 group-hover:opacity-100">
+            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M12,16A2,2 0 0,1 14,18A2,2 0 0,1 12,20A2,2 0 0,1 10,18A2,2 0 0,1 12,16M12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10M12,4A2,2 0 0,1 14,6A2,2 0 0,1 12,8A2,2 0 0,1 10,6A2,2 0 0,1 12,4Z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensaje cuando no hay resultados -->
+  <div *ngIf="contactosFiltrados.length === 0 && isConnected"
+    class="flex flex-col items-center justify-center py-12 px-6">
+    <svg class="w-16 h-16 text-gray-300 mb-4" fill="currentColor" viewBox="0 0 24 24">
+      <path
+        d="M16,17V14H9V10H16V7L21,12L16,17M14,2A2,2 0 0,1 16,4V6H14V4H5V20H14V18H16V20A2,2 0 0,1 14,22H5A2,2 0 0,1 3,20V4A2,2 0 0,1 5,2H14Z" />
+    </svg>
+    <p class="text-gray-500 text-center font-medium">No se encontraron contactos</p>
+    <p class="text-sm text-gray-400 text-center mt-1">Intenta con otro término de búsqueda</p>
+    <button (click)="abrirModalAgregar()"
+      class="mt-4 px-6 py-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-colors">
+      Agregar contacto
+    </button>
+  </div>
+
+  <!-- Modal Agregar Contacto -->
+  <div *ngIf="mostrarModalAgregar" class="fixed inset-0 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl font-bold text-gray-900">Agregar contacto</h3>
+        <button (click)="cerrarModalAgregar()" class="p-2 hover:bg-gray-100 rounded-full">
+          <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+            <path
+              d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Dirección de wallet *
+          </label>
+          <input type="text" [(ngModel)]="nuevoContactoAddress" placeholder="0x..."
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono text-sm">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Nombre (opcional)
+          </label>
+          <input type="text" [(ngModel)]="nuevoContactoNombre" placeholder="Ej: Juan Pérez"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+        </div>
+
+        <div class="flex space-x-3 pt-4">
+          <button (click)="cerrarModalAgregar()"
+            class="flex-1 py-3 border-2 border-gray-300 text-gray-700 rounded-full font-medium hover:bg-gray-50 transition-colors">
+            Cancelar
+          </button>
+          <button (click)="agregarContacto()" [disabled]="!nuevoContactoAddress || isLoading"
+            class="flex-1 py-3 bg-purple-600 text-white rounded-full font-medium hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            {{ isLoading ? 'Agregando...' : 'Agregar' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar Contacto -->
+<div *ngIf="mostrarModalEditar && contactoEditando" class="fixed inset-0 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-xl font-bold text-gray-900">Editar contacto</h3>
+      <button (click)="cerrarModalEditar()" class="p-2 hover:bg-gray-100 rounded-full">
+        <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+          <path
+            d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="mb-6 text-center">
+      <img [src]="contactoEditando.avatar" alt="Avatar" class="w-20 h-20 rounded-full mx-auto mb-3">
+      <p class="text-xs text-gray-500 font-mono">{{ contactoEditando.address }}</p>
+    </div>
+
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Nombre
+        </label>
+        <input type="text" [(ngModel)]="nombreEditando" placeholder="Nombre del contacto"
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+      </div>
+
+      <div class="bg-gray-50 rounded-lg p-4">
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-gray-600">Transacciones realizadas:</span>
+          <span class="font-medium text-gray-900">{{ contactoEditando.transaccionesRealizadas }}</span>
+        </div>
+        <div class="flex items-center justify-between text-sm mt-2" *ngIf="contactoEditando.ultimaTransaccion">
+          <span class="text-gray-600">Última transacción:</span>
+          <span class="font-medium text-gray-900">{{ contactoEditando.ultimaTransaccion | date:'dd/MM/yy' }}</span>
+        </div>
+      </div>
+
+      <div class="flex space-x-3 pt-4">
+        <button (click)="eliminarContacto(contactoEditando, $event)"
+          class="px-4 py-3 border-2 border-red-500 text-red-500 rounded-full font-medium hover:bg-red-50 transition-colors">
+          Eliminar
+        </button>
+        <button (click)="copiarDireccion(contactoEditando.address, $event)"
+          class="flex-1 py-3 border-2 border-gray-300 text-gray-700 rounded-full font-medium hover:bg-gray-50 transition-colors">
+          Copiar dirección
+        </button>
+        <button (click)="guardarEdicion()" [disabled]="!nombreEditando.trim()"
+          class="flex-1 py-3 bg-purple-600 text-white rounded-full font-medium hover:bg-purple-700 transition-colors disabled:opacity-50">
+          Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

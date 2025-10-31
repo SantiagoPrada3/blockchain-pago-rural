@@ -1,0 +1,308 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <div class="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-200">
+    <h1 class="text-xl font-semibold text-gray-900">Perfil</h1>
+    <button (click)="navegarA('/editar-perfil')" class="text-purple-600 font-medium">Editar</button>
+  </div>
+
+  <!-- Información del usuario -->
+  <div class="bg-white px-6 py-8 mb-6">
+    <div class="flex flex-col items-center text-center">
+      <div class="relative mb-4">
+        <img [src]="usuario.avatar" alt="Avatar" class="w-24 h-24 rounded-full">
+        <div class="absolute -bottom-1 -right-1 w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
+          <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path
+              d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.1 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z" />
+          </svg>
+        </div>
+      </div>
+
+      <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ usuario.nombre }}</h2>
+      <p class="text-gray-600 mb-1">{{ usuario.email }}</p>
+      <p class="text-gray-600 mb-4" *ngIf="usuario.mostrarTelefono || !usuario.perfilPublico">{{ usuario.telefono }}</p>
+      <p class="text-gray-500 text-sm mb-4" *ngIf="usuario.direccion">📍 {{ usuario.direccion }}</p>
+
+      <!-- MetaMask Wallet Info -->
+      <div *ngIf="isConnected" class="w-full bg-gradient-to-r from-orange-500 to-yellow-500 rounded-xl p-4 mb-4">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center space-x-2">
+            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+            </svg>
+            <span class="text-white font-medium">MetaMask Wallet</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button (click)="refreshBalance()" class="p-1 hover:bg-white/20 rounded-full transition-colors">
+              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z" />
+              </svg>
+            </button>
+            <button (click)="abrirModalRedes()" class="p-1 hover:bg-white/20 rounded-full transition-colors" title="Gestionar redes">
+              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7.27C13.6,7.61 14,8.26 14,9A2,2 0 0,1 12,11A2,2 0 0,1 10,9A2,2 0 0,1 12,7A2,2 0 0,1 14,9A2,2 0 0,1 12,11A2,2 0 0,1 10,9C10,8.26 10.4,7.61 11,7.27V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M12,15A2,2 0 0,1 14,17A2,2 0 0,1 12,19A2,2 0 0,1 10,17A2,2 0 0,1 12,15M12,13C10.89,13 10,13.89 10,15A2,2 0 0,0 12,17A2,2 0 0,0 14,15C14,13.89 13.11,13 12,13M7,9A2,2 0 0,1 9,11A2,2 0 0,1 7,13A2,2 0 0,1 5,11A2,2 0 0,1 7,9M7,7C5.89,7 5,7.89 5,9A2,2 0 0,0 7,11A2,2 0 0,0 9,9C9,7.89 8.11,7 7,7M17,9A2,2 0 0,1 19,11A2,2 0 0,1 17,13A2,2 0 0,1 15,11A2,2 0 0,1 17,9M17,7C15.89,7 15,7.89 15,9A2,2 0 0,0 17,11A2,2 0 0,0 19,9C19,7.89 18.11,7 17,7Z"/>
+              </svg>
+            </button>
+            <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+          </div>
+        </div>
+        <p class="text-white/90 text-sm font-mono">{{ getShortAddress() }}</p>
+        <div class="flex items-center justify-between mt-2">
+          <p class="text-2xl font-bold text-white">{{ balance }} {{ redActual?.symbol || 'ETH' }}</p>
+          <div class="text-right">
+            <p class="text-white/70 text-xs">Balance actual</p>
+            <div *ngIf="redActual" class="flex items-center space-x-1 mt-1">
+              <div class="w-2 h-2 rounded-full bg-white/70"></div>
+              <span class="text-white/70 text-xs">{{ redActual.name }}</span>
+            </div>
+          </div>
+        </div>
+      </div> 
+     <div *ngIf="!isConnected" class="w-full bg-gray-100 rounded-xl p-4 mb-4">
+        <div class="flex flex-col items-center space-y-2 text-gray-500">
+          <div class="flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+            </svg>
+            <span class="text-sm">Wallet no conectada</span>
+          </div>
+          <button (click)="navegarA('/login')" class="text-xs text-purple-600 hover:text-purple-800">
+            Conectar MetaMask
+          </button>
+        </div>
+      </div>
+
+      <!-- Información adicional del usuario -->
+      <div class="w-full bg-gray-50 rounded-xl p-4 mb-6">
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div *ngIf="usuario.fechaNacimiento">
+            <p class="text-gray-500">Fecha de nacimiento</p>
+            <p class="font-medium text-gray-900">{{ usuario.fechaNacimiento | date:'dd/MM/yyyy' }}</p>
+          </div>
+          <div *ngIf="usuario.genero">
+            <p class="text-gray-500">Género</p>
+            <p class="font-medium text-gray-900 capitalize">{{ usuario.genero.replace('_', ' ') }}</p>
+          </div>
+        </div>
+        <div class="mt-3 pt-3 border-t border-gray-200" *ngIf="usuario.perfilPublico">
+          <div class="flex items-center space-x-2 text-green-600">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+            </svg>
+            <span class="text-sm font-medium">Perfil público</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="flex space-x-4 w-full">
+        <button (click)="navegarA('/enviar-dinero')"
+          class="flex-1 flex items-center justify-center space-x-2 py-3 px-4 border-2 border-purple-600 text-purple-600 rounded-full hover:bg-purple-50 transition-colors">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+          </svg>
+          <span>Recargar</span>
+        </button>
+
+        <button (click)="navegarA('/mi-qr')"
+          class="flex items-center justify-center space-x-2 py-3 px-6 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4z" />
+          </svg>
+          <span>Mi QR</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menú de opciones -->
+  <div class="bg-white">
+    <div *ngFor="let item of menuItems; let last = last"
+      class="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors cursor-pointer"
+      [class.border-b]="!last" [class.border-gray-200]="!last" (click)="navegarA(item.ruta)">
+      <div class="flex items-center space-x-4">
+        <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+          <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+            <!-- Shield icon -->
+            <path *ngIf="item.icon === 'shield'"
+              d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.6 14.8,10V11.5C15.4,11.5 16,12.1 16,12.7V16.2C16,16.8 15.4,17.3 14.8,17.3H9.2C8.6,17.3 8,16.8 8,16.2V12.8C8,12.2 8.6,11.7 9.2,11.7V10C9.2,8.6 10.6,7 12,7M12,8.2C11.2,8.2 10.5,8.7 10.5,9.5V11.5H13.5V9.5C13.5,8.7 12.8,8.2 12,8.2Z" />
+            <!-- Bell icon -->
+            <path *ngIf="item.icon === 'bell'"
+              d="M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M14,21A2,2 0 0,1 12,23A2,2 0 0,1 10,21" />
+            <!-- Bank icon -->
+            <path *ngIf="item.icon === 'bank'"
+              d="M11.5,1L2,6V8H21V6M16,10V17H19V19H4V17H7V10H9V17H11V10H13V17H15V10H16Z" />
+            <!-- Help icon -->
+            <path *ngIf="item.icon === 'help'"
+              d="M15.07,11.25L14.17,12.17C13.45,12.89 13,13.5 13,15H11V14.5C11,13.39 11.45,12.39 12.17,11.67L13.41,10.41C13.78,10.05 14,9.55 14,9C14,7.89 13.1,7 12,7A2,2 0 0,0 10,9H8A4,4 0 0,1 12,5A4,4 0 0,1 16,9C16,9.88 15.64,10.67 15.07,11.25M13,19H11V17H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12C22,6.47 17.5,2 12,2Z" />
+            <!-- Document icon -->
+            <path *ngIf="item.icon === 'document'"
+              d="M13,9V3.5L18.5,9M6,2C4.89,2 4,2.89 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2H6Z" />
+            <!-- Info icon -->
+            <path *ngIf="item.icon === 'info'"
+              d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
+          </svg>
+        </div>
+        <div>
+          <p class="font-medium text-gray-900">{{ item.titulo }}</p>
+          <p class="text-sm text-gray-500">{{ item.subtitulo }}</p>
+        </div>
+      </div>
+      <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- Botón cerrar sesión -->
+  <div class="p-6">
+    <button (click)="cerrarSesion()"
+      class="w-full py-4 border-2 border-red-500 text-red-500 rounded-full font-medium hover:bg-red-50 transition-colors flex items-center justify-center space-x-2">
+      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+        <path
+          d="M17,7L15.59,8.41L18.17,11H8V13H18.17L15.59,15.59L17,17L22,12L17,7M4,5H12V3H4C2.89,3 2,3.89 2,5V19A2,2 0 0,0 4,21H12V19H4V5Z" />
+      </svg>
+      <span>Cerrar sesión</span>
+    </button>
+  </div>  <!-- Mo
+dal Gestionar Redes -->
+  <div *ngIf="mostrarModalRedes" class="fixed inset-0 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl max-h-[80vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl font-bold text-gray-900">Gestionar Redes</h3>
+        <button (click)="cerrarModalRedes()" class="p-2 hover:bg-gray-100 rounded-full">
+          <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Red Actual -->
+      <div *ngIf="redActual" class="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl">
+        <div class="flex items-center space-x-3">
+          <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+          <div class="flex-1">
+            <p class="font-semibold text-green-800">Red Actual</p>
+            <p class="text-sm text-green-600">{{ redActual.name }}</p>
+            <p class="text-xs text-green-500">Chain ID: {{ redActual.chainId }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista de Redes Disponibles -->
+      <div class="mb-6">
+        <h4 class="font-semibold text-gray-900 mb-3">Redes Disponibles</h4>
+        <div class="space-y-2">
+          <div *ngFor="let red of redesDisponibles; trackBy: trackByRed" 
+               class="flex items-center justify-between p-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
+               [class.bg-green-50]="red.chainId === redActual?.chainId"
+               [class.border-green-300]="red.chainId === redActual?.chainId">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                   [style.background-color]="red.color">
+                {{ red.symbol }}
+              </div>
+              <div>
+                <p class="font-medium text-gray-900">{{ red.name }}</p>
+                <p class="text-xs text-gray-500">{{ red.rpcUrl }}</p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span *ngIf="red.chainId === redActual?.chainId" 
+                    class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                Activa
+              </span>
+              <button *ngIf="red.chainId !== redActual?.chainId"
+                      (click)="cambiarRed(red)"
+                      class="text-xs bg-purple-100 text-purple-700 px-3 py-1 rounded-full hover:bg-purple-200 transition-colors">
+                Cambiar
+              </button>
+              <button *ngIf="red.esPersonalizada"
+                      (click)="eliminarRed(red)"
+                      class="p-1 text-red-500 hover:bg-red-50 rounded-full">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botón Agregar Nueva Red -->
+      <button (click)="mostrarFormularioRed = !mostrarFormularioRed"
+              class="w-full py-3 border-2 border-dashed border-gray-300 text-gray-600 rounded-xl hover:border-purple-500 hover:text-purple-600 transition-colors mb-4">
+        <div class="flex items-center justify-center space-x-2">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
+          </svg>
+          <span>{{ mostrarFormularioRed ? 'Cancelar' : 'Agregar Nueva Red' }}</span>
+        </div>
+      </button>
+
+      <!-- Formulario Agregar Red -->
+      <div *ngIf="mostrarFormularioRed" class="space-y-4 p-4 bg-gray-50 rounded-xl">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Nombre de la Red *</label>
+          <input type="text" [(ngModel)]="nuevaRed.name" placeholder="Ej: Polygon Mainnet"
+                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 placeholder-gray-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">RPC URL *</label>
+          <input type="url" [(ngModel)]="nuevaRed.rpcUrl" placeholder="https://..."
+                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 placeholder-gray-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Chain ID *</label>
+          <input type="text" [(ngModel)]="nuevaRed.chainId" placeholder="0x89"
+                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 placeholder-gray-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Símbolo de Moneda *</label>
+          <input type="text" [(ngModel)]="nuevaRed.symbol" placeholder="MATIC"
+                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 placeholder-gray-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Block Explorer URL</label>
+          <input type="url" [(ngModel)]="nuevaRed.blockExplorerUrl" placeholder="https://polygonscan.com"
+                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 placeholder-gray-500">
+        </div>
+
+        <div class="flex space-x-3 pt-2">
+          <button (click)="mostrarFormularioRed = false"
+                  class="flex-1 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+            Cancelar
+          </button>
+          <button (click)="agregarNuevaRed()"
+                  [disabled]="!nuevaRed.name || !nuevaRed.rpcUrl || !nuevaRed.chainId || !nuevaRed.symbol"
+                  class="flex-1 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            Agregar Red
+          </button>
+        </div>
+      </div>
+
+      <!-- Información -->
+      <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-xl">
+        <div class="flex items-start space-x-2">
+          <svg class="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+          </svg>
+          <div>
+            <p class="text-sm font-medium text-blue-800">Información</p>
+            <p class="text-xs text-blue-600 mt-1">
+              Al cambiar de red, tu balance y transacciones pueden ser diferentes. 
+              Asegúrate de usar la red correcta para tus operaciones.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

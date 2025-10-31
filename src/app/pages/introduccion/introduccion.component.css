@@ -1,0 +1,100 @@
+/* Estilos específicos para la página de introducción */
+.card-mobile {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-mobile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.tap-animation {
+  transition: transform 0.1s ease;
+}
+
+.tap-animation:active {
+  transform: scale(0.95);
+}
+
+/* Animaciones para los elementos */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bg-white\/10 {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.bg-white\/10:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.bg-white\/10:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.bg-white\/10:nth-child(4) {
+  animation-delay: 0.3s;
+}
+
+.bg-white\/10:nth-child(5) {
+  animation-delay: 0.4s;
+}
+
+/* Estilos para el input de archivo */
+input[type="file"] {
+  display: none;
+}
+
+/* Efectos hover para botones */
+button:hover {
+  transition: all 0.2s ease;
+}
+
+/* Estilos para las imágenes de perfil */
+img {
+  transition: transform 0.2s ease;
+}
+
+img:hover {
+  transform: scale(1.05);
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+}
+
+/* Estilos para el modal */
+.fixed {
+  backdrop-filter: blur(4px);
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Animación para el botón principal */
+.bg-gradient-to-r {
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}

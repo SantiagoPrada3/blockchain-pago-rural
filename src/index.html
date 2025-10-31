@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <title>Pago Rural</title>
+  <base href="/">
+
+  <!-- Meta tags para móvil -->
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Pago Rural">
+  <meta name="theme-color" content="#8b5cf6">
+  <meta name="msapplication-navbutton-color" content="#8b5cf6">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+  <!-- Prevenir zoom en inputs -->
+  <meta name="format-detection" content="telephone=no">
+
+  <!-- PWA Meta tags -->
+  <meta name="description" content="Aplicación de pagos móviles para zonas rurales">
+  <meta name="keywords" content="pagos, móvil, rural, transferencias, dinero">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="pagope.png">
+  <link rel="apple-touch-icon" href="pagope.png">
+
+  <!-- Preload de fuentes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+</head>
+
+<body>
+  <app-root></app-root>
+
+  <!-- Script para prevenir zoom en iOS -->
+  <script>
+    document.addEventListener('gesturestart', function (e) {
+      e.preventDefault();
+    });
+
+    // Prevenir zoom con doble tap
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function (event) {
+      const now = (new Date()).getTime();
+      if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, false);
+
+    // Registrar Service Worker para PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('SW registrado: ', registration);
+          })
+          .catch((registrationError) => {
+            console.log('SW falló: ', registrationError);
+          });
+      });
+    }
+  </script>
+</body>
+
+</html>

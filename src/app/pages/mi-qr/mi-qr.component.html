@@ -1,0 +1,95 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-900 to-black">
+  <!-- Header -->
+  <div class="flex items-center justify-between p-6 pt-12 text-white">
+    <button (click)="volver()" class="p-2 hover:bg-white/10 rounded-full transition-colors">
+      <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+      </svg>
+    </button>
+    
+    <div class="text-center">
+      <h1 class="text-xl font-semibold">{{ usuario.nombre }} / {{ redActual?.name || 'Ethereum' }}</h1>
+      <!-- Indicador de red con botón para cambiar -->
+      <div *ngIf="redActual" class="flex items-center justify-center space-x-2 mt-2">
+        <div class="w-3 h-3 rounded-full" [style.background-color]="redActual.color"></div>
+        <span class="text-sm opacity-90">{{ redActual.name }}</span>
+        <button *ngIf="redActual.chainId !== '0x4268'" 
+                (click)="cambiarAHolesky()"
+                class="ml-2 px-3 py-1 bg-orange-500 text-white text-xs rounded-full hover:bg-orange-600 transition-colors">
+          Cambiar a Holesky
+        </button>
+      </div>
+    </div>
+    
+    <button (click)="volver()" class="p-2 hover:bg-white/10 rounded-full transition-colors">
+      <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="flex-1 px-6 py-8">
+    <!-- Estado conectado -->
+    <div *ngIf="isConnected && account" class="text-center">
+      <!-- QR Code Container -->
+      <div class="bg-white rounded-3xl p-8 mx-auto max-w-sm shadow-2xl mb-8">
+        
+        <!-- QR Code Real -->
+        <div class="flex justify-center mb-6">
+          <div class="bg-gray-100 p-4 rounded-2xl border-2 border-gray-300">
+            <canvas #qrCanvas width="280" height="280" class="block bg-white border border-gray-400"></canvas>
+          </div>
+        </div>
+
+        <!-- Título y descripción -->
+        <div class="text-center mb-6">
+          <h2 class="text-lg font-bold text-gray-900 mb-2">{{ redActual?.name || 'Ethereum' }} Address</h2>
+          <p class="text-sm text-gray-600 mb-4">
+            Use this address to receive tokens and collectibles on {{ redActual?.name || 'Ethereum' }}
+          </p>
+          
+          <!-- Dirección completa -->
+          <div class="bg-gray-50 rounded-xl p-4 mb-4">
+            <p class="text-sm font-mono text-gray-800 break-all">{{ account }}</p>
+          </div>
+          
+          <!-- Botones -->
+          <div class="space-y-3">
+            <button (click)="copiarDireccion()" 
+                    class="flex items-center justify-center space-x-2 mx-auto px-6 py-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/>
+              </svg>
+              <span class="text-sm font-medium">Copy address</span>
+            </button>
+            
+            <!-- Botón de prueba para generar QR -->
+            <button (click)="generarQR()" 
+                    class="flex items-center justify-center space-x-2 mx-auto px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors text-xs">
+              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M11,16.5L6.5,12L7.91,10.59L11,13.67L16.59,8.09L18,9.5L11,16.5Z"/>
+              </svg>
+              <span>Generar QR</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estado no conectado -->
+    <div *ngIf="!isConnected" class="text-center text-white">
+      <div class="bg-white/10 backdrop-blur-sm rounded-3xl p-8 mx-auto max-w-sm">
+        <svg class="w-16 h-16 mx-auto text-white/60 mb-4" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+        <h2 class="text-xl font-bold mb-4">Conecta tu Wallet</h2>
+        <p class="text-white/80 mb-6">Necesitas conectar MetaMask para generar tu código QR</p>
+        <button (click)="router.navigate(['/login'])" 
+                class="w-full py-3 bg-white text-purple-600 rounded-full font-semibold hover:bg-gray-50 transition-colors">
+          Conectar MetaMask
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

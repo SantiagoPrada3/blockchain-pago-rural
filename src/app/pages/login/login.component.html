@@ -1,0 +1,146 @@
+<div
+  class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4 relative overflow-hidden"
+>
+  <!-- Animated background elements -->
+  <div class="absolute inset-0 overflow-hidden">
+    <div
+      class="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"
+    ></div>
+    <div
+      class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-2000"
+    ></div>
+    <div
+      class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse animation-delay-4000"
+    ></div>
+  </div>
+
+  <!-- Grid pattern overlay -->
+  <div class="absolute inset-0 bg-grid-pattern opacity-5"></div>
+
+  <!-- Main login container -->
+  <div class="relative z-10 w-full max-w-md">
+    <!-- Logo/Brand section -->
+    <div class="text-center mb-8">
+      <div
+        class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-2xl mb-4 shadow-2xl"
+      >
+        <svg
+          class="w-10 h-10 text-white"
+          fill="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+        </svg>
+      </div>
+      <h1 class="text-3xl font-bold text-white mb-2">Pago Rural</h1>
+      <p class="text-gray-300 text-sm">Conecta tu wallet para continuar</p>
+    </div>
+
+    <!-- Login card -->
+    <div
+      class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20"
+    >
+      <!-- Connection status -->
+      <div *ngIf="!isConnected" class="text-center mb-8">
+        <div
+          class="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-orange-400 to-pink-500 rounded-full flex items-center justify-center shadow-lg"
+        >
+          <svg
+            class="w-8 h-8 text-white"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+            />
+          </svg>
+        </div>
+        <h2 class="text-xl font-semibold text-white mb-2">Conectar MetaMask</h2>
+        <p class="text-gray-300 text-sm">
+          Autoriza el acceso a tu wallet para comenzar
+        </p>
+      </div>
+
+      <!-- Connected status -->
+      <div *ngIf="isConnected" class="text-center mb-8">
+        <div
+          class="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center shadow-lg animate-pulse"
+        >
+          <svg
+            class="w-8 h-8 text-white"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h2 class="text-xl font-semibold text-green-400 mb-2">¡Conectado!</h2>
+        <p class="text-gray-300 text-sm">{{ getShortAddress() }}</p>
+        <div class="mt-4 p-4 bg-black/20 rounded-xl">
+          <p class="text-gray-400 text-xs mb-1">Balance ETH</p>
+          <p class="text-2xl font-bold text-white">{{ balance }} ETH</p>
+        </div>
+      </div>
+
+      <!-- Connect button -->
+      <button
+        *ngIf="!isConnected"
+        (click)="connectWallet()"
+        [disabled]="isConnecting"
+        class="w-full bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 disabled:from-gray-500 disabled:to-gray-600 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-300 transform hover:scale-105 disabled:scale-100 shadow-lg hover:shadow-xl disabled:cursor-not-allowed flex items-center justify-center space-x-3"
+      >
+        <div *ngIf="isConnecting" class="flex items-center space-x-3">
+          <div
+            class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"
+          ></div>
+          <span>Conectando...</span>
+        </div>
+
+        <div *ngIf="!isConnecting" class="flex items-center space-x-3">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+          </svg>
+          <span>Conectar MetaMask</span>
+        </div>
+      </button>
+
+      <!-- Redirecting message -->
+      <div *ngIf="isConnected" class="text-center">
+        <div class="flex items-center justify-center space-x-2 text-green-400">
+          <div
+            class="animate-spin rounded-full h-4 w-4 border-b-2 border-green-400"
+          ></div>
+          <span class="text-sm">Redirigiendo...</span>
+        </div>
+      </div>
+
+      <!-- Error message -->
+      <div
+        *ngIf="error"
+        class="mt-4 p-4 bg-red-500/20 border border-red-500/30 rounded-xl"
+      >
+        <p class="text-red-300 text-sm text-center">{{ error }}</p>
+      </div>
+
+      <!-- MetaMask info -->
+      <div class="mt-8 text-center">
+        <p class="text-gray-400 text-xs mb-2">¿No tienes MetaMask?</p>
+        <a
+          href="https://metamask.io/download/"
+          target="_blank"
+          class="text-cyan-400 hover:text-cyan-300 text-sm font-medium transition-colors duration-200"
+        >
+          Descargar MetaMask
+        </a>
+      </div>
+    </div>
+
+    <!-- Security note -->
+    <div class="mt-6 text-center">
+      <p class="text-gray-400 text-xs">
+        🔒 Tu wallet está protegida por MetaMask. Nunca compartimos tus claves
+        privadas.
+      </p>
+    </div>
+  </div>
+</div>

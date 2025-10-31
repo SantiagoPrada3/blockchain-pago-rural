@@ -1,0 +1,13 @@
+<!-- Status bar overlay para simular móvil -->
+<div class="status-bar-overlay" *ngIf="showNavigation"></div>
+
+<!-- Contenedor principal de la app -->
+<div class="min-h-screen safe-area-top" [class.bg-gray-50]="showNavigation" [class.pb-20]="showNavigation">
+  <!-- Contenido principal -->
+  <main class="fade-in">
+    <router-outlet />
+  </main>
+
+  <!-- Navegación inferior - Solo mostrar si no estamos en login -->
+  <app-bottom-nav *ngIf="showNavigation" />
+</div>

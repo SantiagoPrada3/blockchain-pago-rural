@@ -1,0 +1,97 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <div class="bg-white px-6 py-4 border-b border-gray-200">
+    <h1 class="text-xl font-semibold text-gray-900">Pagar</h1>
+    <p class="text-sm text-gray-500 mt-1">Elige cómo quieres realizar tu pago</p>
+  </div>
+
+  <!-- Opciones de pago -->
+  <div class="p-6">
+    <div class="grid grid-cols-2 gap-4 mb-8">
+      <div *ngFor="let opcion of opcionesPago"
+           (click)="navegarA(opcion.ruta)"
+           class="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+        <div class="flex flex-col items-center text-center">
+          <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
+               [ngClass]="opcion.color">
+            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <!-- Send icon -->
+              <path *ngIf="opcion.icono === 'send'" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+              <!-- QR icon -->
+              <path *ngIf="opcion.icono === 'qr'" d="M3 11h8V3H3v8zm2-6h4v4H5V5zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4z"/>
+              <!-- Services icon -->
+              <path *ngIf="opcion.icono === 'services'" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              <!-- Phone icon -->
+              <path *ngIf="opcion.icono === 'phone'" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+              <!-- Store icon -->
+              <path *ngIf="opcion.icono === 'store'" d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z"/>
+              <!-- Bank icon -->
+              <path *ngIf="opcion.icono === 'bank'" d="M11.5,1L2,6V8H21V6M16,10V17H19V19H4V17H7V10H9V17H11V10H13V17H15V10H16Z"/>
+            </svg>
+          </div>
+          <h3 class="font-semibold text-gray-900 mb-1">{{ opcion.titulo }}</h3>
+          <p class="text-xs text-gray-500 leading-tight">{{ opcion.descripcion }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Acceso rápido -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm mb-6">
+      <h3 class="font-semibold text-gray-900 mb-4">Acceso rápido</h3>
+      <div class="flex space-x-4">
+        <button (click)="navegarA('/mi-qr')"
+                class="flex-1 py-3 bg-purple-100 text-purple-700 rounded-xl font-medium hover:bg-purple-200 transition-colors">
+          Mi QR
+        </button>
+        <button (click)="navegarA('/enviar-dinero')"
+                class="flex-1 py-3 bg-blue-100 text-blue-700 rounded-xl font-medium hover:bg-blue-200 transition-colors">
+          Enviar
+        </button>
+        <button (click)="mostrarMensaje('Función próximamente disponible')"
+                class="flex-1 py-3 bg-green-100 text-green-700 rounded-xl font-medium hover:bg-green-200 transition-colors">
+          Escanear
+        </button>
+      </div>
+    </div>
+
+    <!-- Transacciones recientes -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-semibold text-gray-900">Transacciones recientes</h3>
+        <button (click)="navegarA('/historial')" class="text-purple-600 text-sm font-medium">Ver todas</button>
+      </div>
+
+      <div class="space-y-4">
+        <div *ngFor="let transaccion of transaccionesRecientes"
+             class="flex items-center space-x-4">
+          <img [src]="transaccion.avatar" alt="Avatar" class="w-12 h-12 rounded-full">
+          <div class="flex-1">
+            <p class="font-medium text-gray-900">{{ transaccion.nombre }}</p>
+            <p class="text-sm text-gray-500">{{ transaccion.descripcion }}</p>
+          </div>
+          <div class="text-right">
+            <p class="font-semibold"
+               [class.text-red-600]="transaccion.monto < 0"
+               [class.text-green-600]="transaccion.monto > 0">
+              {{ transaccion.monto > 0 ? '+' : '' }}S/ {{ Math.abs(transaccion.monto).toFixed(2) }}
+            </p>
+            <p class="text-xs text-gray-500">{{ transaccion.fecha }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Consejos de seguridad -->
+    <div class="mt-6 bg-blue-50 border border-blue-200 rounded-2xl p-4">
+      <div class="flex items-start space-x-3">
+        <svg class="w-6 h-6 text-blue-600 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.6 14.8,10V11.5C15.4,11.5 16,12.1 16,12.7V16.2C16,16.8 15.4,17.3 14.8,17.3H9.2C8.6,17.3 8,16.8 8,16.2V12.8C8,12.2 8.6,11.7 9.2,11.7V10C9.2,8.6 10.6,7 12,7M12,8.2C11.2,8.2 10.5,8.7 10.5,9.5V11.5H13.5V9.5C13.5,8.7 12.8,8.2 12,8.2Z"/>
+        </svg>
+        <div>
+          <p class="font-medium text-blue-900 mb-1">Consejo de seguridad</p>
+          <p class="text-sm text-blue-700">Nunca compartas tu PIN o datos personales. Verifica siempre el destinatario antes de enviar dinero.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,82 @@
+/* Estilos específicos para la navegación inferior móvil */
+
+.nav-item {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.nav-icon-container {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+/* Estado activo */
+.nav-active {
+  color: #8b5cf6;
+  background-color: rgba(139, 92, 246, 0.1);
+}
+
+.nav-active .nav-icon-container {
+  transform: translateY(-2px);
+}
+
+/* Estado inactivo */
+.nav-inactive {
+  color: #6b7280;
+}
+
+.nav-inactive:hover {
+  color: #4b5563;
+  background-color: rgba(107, 114, 128, 0.05);
+}
+
+/* Animación de tap */
+.nav-item:active {
+  transform: scale(0.95);
+}
+
+.nav-item:active .nav-icon-container {
+  transform: translateY(0) scale(0.9);
+}
+
+/* Indicador de página activa */
+.nav-active::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background-color: #8b5cf6;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translateX(-50%) scale(1.2);
+  }
+}
+
+/* Responsive para pantallas muy pequeñas */
+@media (max-width: 320px) {
+  .nav-item {
+    min-width: 50px;
+    padding: 6px 8px;
+  }
+
+  .nav-item svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .nav-item span {
+    font-size: 10px;
+  }
+}
